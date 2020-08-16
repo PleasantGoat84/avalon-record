@@ -169,7 +169,7 @@ $(document).ready(() => {
             width: calc(calc(50vw - 260px) * 0.8);
             border-radius: 1em;
 
-            z-index: 499;
+            z-index: 999999;
 
             display: flex;
             flex-direction: column;
