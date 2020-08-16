@@ -14,30 +14,7 @@ const stateApiPattern = /https:\/\/avalon\.fun\/api\/game\/GAME-.+\/state/;
 console.info("Record CCI Loaded!");
 
 $(document).ready(() => {
-    /* setTimeout(() => {
-        $(".game__game-id-container").css({
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-        });
-
-        $(".g-tbl").css(
-            "transform",
-            `translateX(-50%) scale(${
-        $(window).height() / ($(".g-tbl").outerHeight() + 60 * 2 + 200)
-        })`
-    );
-
-      $(".g-tbl").css(
-          "transform",
-          `${$(".g-tbl").css("transform")} translateY(${
-        ($(".g-tbl").offset().top - 90) * -1
-        }px)`
-    );
-  }, 3 * 1000); */
-
-    $("body").append(`
+  $("body").append(`
     <div id="record-cci">
       <div class="tabs-container flex v" id="resultQuery">
         <div class="tabs flex">
@@ -56,21 +33,21 @@ $(document).ready(() => {
     </div>
   `);
 
-    $("#record-cci .tab-content").append(`<table></table>`);
+  $("#record-cci .tab-content").append(`<table></table>`);
 
-    XMLHttpRequest.prototype.realSend = XMLHttpRequest.prototype.send;
-    XMLHttpRequest.prototype.send = function (reqData) {
-        this.realSend(reqData);
-        this.onload = () => {
-            if (this.responseURL.match(stateApiPattern)) {
-                let resp = JSON.parse(this.responseText);
-                console.debug(resp);
+  XMLHttpRequest.prototype.realSend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.send = function (reqData) {
+    this.realSend(reqData);
+    this.onload = () => {
+      if (this.responseURL.match(stateApiPattern)) {
+        let resp = JSON.parse(this.responseText);
+        console.debug(resp);
 
-                if ($("#record-cci .tab-content tr").length <= 1) {
-                    resp.players.forEach((player) => {
-                        console.debug(player.displayName);
-                        $("#record-cci .tab-content table").append(
-                            `<tr>
+        if ($("#record-cci .tab-content tr").length <= 1) {
+          resp.players.forEach((player) => {
+            console.debug(player.displayName);
+            $("#record-cci .tab-content table").append(
+              `<tr>
                 <th>${player.displayName}</th>
                 <td class="vote-result"> - </td>
                 <td class="vote-result"> - </td>
@@ -82,90 +59,91 @@ $(document).ready(() => {
           });
         }
 
-          let activeQuest = resp.activeQuest;
-          if (
-              activeQuest.teamProposal.isApproved !== null &&
-              activeQuest.teamProposal.votes[0] !== undefined
-          ) {
-              activeQuest.teamProposal.votes.forEach((vote) => {
-                  let queryString = `#record-cci .tab-content:nth-of-type(${
+        let activeQuest = resp.activeQuest;
+        if (
+          activeQuest.teamProposal.isApproved !== null &&
+          activeQuest.teamProposal.votes[0] !== undefined
+        ) {
+          activeQuest.teamProposal.votes.forEach((vote) => {
+            let queryString = `#record-cci .tab-content:nth-of-type(${
               1 + activeQuest.number
             }) tr:contains("${vote.player.displayName}") td:nth-of-type(${
               activeQuest.teamProposal.isApproved
-            ? resp.teamsRejectedStreak + 1
-            : resp.teamsRejectedStreak
+                ? resp.teamsRejectedStreak + 1
+                : resp.teamsRejectedStreak
             })`;
 
-              console.debug(queryString);
+            console.debug(queryString);
 
-              $(queryString)
-                  .removeClass("none")
-                  .addClass(vote.vote.toLowerCase())
-                  .text(vote.vote === "APPROVE" ? "✔" : "✘")
-                  .addClass(
-                  activeQuest.teamProposal.team.some(
-                      (player) => player.displayName === vote.player.displayName
-                  )
+            $(queryString)
+              .removeClass("none")
+              .addClass(vote.vote.toLowerCase())
+              .text(vote.vote === "APPROVE" ? "✔" : "✘")
+              .addClass(
+                activeQuest.teamProposal.team.some(
+                  (player) => player.displayName === vote.player.displayName
+                )
                   ? "chosen"
                   : ""
               );
           });
 
-            if (activeQuest.teamProposal.isApproved) {
-                $(
-                    `#record-cci .tab-content:nth-of-type(${
+          if (activeQuest.teamProposal.isApproved) {
+            $(
+              `#record-cci .tab-content:nth-of-type(${
                 1 + activeQuest.number
-                }) tr`
+              }) tr`
             ).each(function (row) {
-                $(this)
-                    .find(`.vote-result:gt(${resp.teamsRejectedStreak})`)
-                    .addClass("no")
-                    .text("🛇");
+              $(this)
+                .find(`.vote-result:gt(${resp.teamsRejectedStreak})`)
+                .addClass("no")
+                .text("🛇");
             });
 
-              activeQuest.teamProposal.team.forEach((player) => {
-                  $(
-                      `#record-cci .tab-content:nth-of-type(${
+            activeQuest.teamProposal.team.forEach((player) => {
+              $(
+                `#record-cci .tab-content:nth-of-type(${
                   1 + activeQuest.number
-                  }) th:contains(${player.displayName})`
+                }) th:contains(${player.displayName})`
               ).addClass("chosen");
             });
           }
         }
-
+        if (activeQuest.number !== null) {
           let queryString = `#record-cci .tab-content:lt(${
-          activeQuest.number - 1
-      }) td.vote-result:not(.approve, .reject, .no)`;
+            activeQuest.number - 1
+          }) td.vote-result:not(.approve, .reject, .no)`;
           console.debug(queryString);
           $(queryString).addClass("unknown").text("?");
 
           $(
-              `#record-cci .tab-content:nth-of-type(${1 + activeQuest.number}) tr`
-        ).each(function (row) {
+            `#record-cci .tab-content:nth-of-type(${1 + activeQuest.number}) tr`
+          ).each(function (row) {
             $(this)
-                .find(
+              .find(
                 `.vote-result:lt(${resp.teamsRejectedStreak}):not(.approve, .reject, .no)`
-            )
+              )
               .addClass("unknown")
               .text("?");
-        });
+          });
+        }
       }
     };
   };
 
-    $("#record-cci .tab").on("click", (event) => {
-        let targetPage = Number(event.target.innerText);
-        console.log(targetPage);
+  $("#record-cci .tab").on("click", (event) => {
+    let targetPage = Number(event.target.innerText);
+    console.log(targetPage);
 
-        $("#record-cci .tab, #record-cci .tab-content").removeClass("active");
-        $(
-            `#record-cci .tab:nth-of-type(${targetPage}), #record-cci .tab-content:nth-of-type(${
+    $("#record-cci .tab, #record-cci .tab-content").removeClass("active");
+    $(
+      `#record-cci .tab:nth-of-type(${targetPage}), #record-cci .tab-content:nth-of-type(${
         1 + targetPage
-        })`
+      })`
     ).addClass("active");
   });
 
-    $("body").append(`
+  $("body").append(`
         <style>
           .flex {
             display: flex;
