@@ -14,7 +14,7 @@ const stateApiPattern = /https:\/\/avalon\.fun\/api\/game\/GAME-.+\/state/;
 console.info("Record CCI Loaded!");
 
 $(document).ready(() => {
-    setTimeout(() => {
+    /* setTimeout(() => {
         $(".game__game-id-container").css({
             position: "fixed",
             top: 0,
@@ -35,7 +35,7 @@ $(document).ready(() => {
         ($(".g-tbl").offset().top - 90) * -1
         }px)`
     );
-  }, 3 * 1000);
+  }, 3 * 1000); */
 
     $("body").append(`
     <div id="record-cci">
